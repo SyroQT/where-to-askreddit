@@ -3,7 +3,7 @@ import json
 
 import pickle
 from cleantext import clean
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, url_for
 
 app = Flask(__name__)
 
@@ -44,19 +44,31 @@ def index():
         return render_template("index.html")
 
     if request.method == "POST":
+        if request.form:
+            title = [request.form["title"]]
+            content = [request.form["content"]]
+        else:
+            try:
+                data = json.loads(request.data)["data"]
+                title = data["title"]
+                content = data["content"]
+            except:
+                return json.dumps({"error": "Bad data format"}), 400
+
         try:
-            data = json.loads(request.data)["data"]
-            title = data["title"]
-            content = data["content"]
             features = __process(title, content)
         except:
-            return json.dumps({"error": "Bad data format"}), 400
+            return json.dumps({"error": "Error while parsing the data"}), 400
 
         try:
             prediction = __predict(features)
         except:
             return json.dumps({"error": "Prediction failed"}), 500
-        return json.dumps({"predictions": prediction.tolist()})
+
+        if request.form:
+            return render_template("index.html", prediction=prediction[0])
+        else:
+            return json.dumps({"predictions": prediction.tolist()})
 
 
 @app.route("/info", methods=["GET", "POST"])

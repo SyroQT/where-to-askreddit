@@ -3,6 +3,8 @@ import json
 import pytest
 import requests
 
+url = "http://127.0.0.1:5000/"
+
 multi_data = {
     "data": {
         "title": [
@@ -33,20 +35,20 @@ bad_format = {
 
 
 def test_single():
-    resp = requests.post("http://127.0.0.1:5000/", json.dumps(single_data))
+    resp = requests.post(url, json.dumps(single_data))
     assert resp.status_code == 200
 
 
 def test_multi():
-    resp = requests.post("http://127.0.0.1:5000/", json.dumps(multi_data))
+    resp = requests.post(url, json.dumps(multi_data))
     assert resp.status_code == 200
 
 
 def test_bad_format():
-    resp = requests.post("http://127.0.0.1:5000/", json.dumps(bad_format))
+    resp = requests.post(url, json.dumps(bad_format))
     assert resp.status_code == 400
 
 
 def test_error_wrong_len():
-    resp = requests.post("http://127.0.0.1:5000/", json.dumps(bad_len))
+    resp = requests.post(url, json.dumps(bad_len))
     assert resp.status_code == 400
