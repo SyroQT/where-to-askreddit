@@ -12,6 +12,7 @@ with open("model.pkl", "rb") as handle:
 
 
 def __process(title, content):
+    """Process data and cleans it for prediction"""
     features = []
     if len(title) == len(content):
         for t, c in zip(title, content):
@@ -56,6 +57,12 @@ def index():
         except:
             return json.dumps({"error": "Prediction failed"}), 500
         return json.dumps({"predictions": prediction.tolist()})
+
+
+@app.route("/info", methods=["GET", "POST"])
+def info():
+    """Return last 10 predictions made"""
+    pass
 
 
 if __name__ == "__main__":
