@@ -5,3 +5,4 @@ numpy
 sklearn
 pickle5
 clean-text[gpl]
+psycopg2
