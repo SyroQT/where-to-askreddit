@@ -3,9 +3,10 @@ import json
 from datetime import datetime
 
 import pickle
+from flask.templating import DispatchingJinjaLoader
 import psycopg2
 from cleantext import clean
-from flask import Flask, request, render_template, url_for
+from flask import Flask, request, render_template
 
 app = Flask(__name__)
 
@@ -108,10 +109,29 @@ def index():
             return json.dumps({"predictions": prediction.tolist()})
 
 
-@app.route("/info", methods=["GET", "POST"])
+@app.route("/info", methods=["GET"])
 def info():
     """Return last 10 predictions made"""
-    pass
+    _, cur = __connect()
+    cur.execute(
+        """
+        SELECT * FROM (
+            SELECT * FROM history ORDER BY id DESC LIMIT 10
+        )Var1
+        ORDER BY id ASC;
+    ;"""
+    )
+    rows = cur.fetchall()
+    data = []
+    for row in rows:
+        entry = dict.fromkeys(["id", "features", "prediction", "datetime"])
+        entry["id"] = row[0]
+        entry["features"] = row[1]
+        entry["prediction"] = row[2]
+        entry["datetime"] = row[3].strftime("%m/%d/%Y")
+        data.append(entry)
+    # TODO: format into json type dict and return json
+    return json.dumps(data)
 
 
 if __name__ == "__main__":
